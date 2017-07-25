@@ -12,7 +12,8 @@ class BookItem extends Component {
   render() {
     const book = this.props.book;
     const title = book.title;
-    const authors = book.authors.reduce((acc, cur) => acc? `${acc}; ${cur}` : `${cur}`, '');
+    const authors = book.authors ? book.authors.reduce(
+      (acc, cur) => acc? `${acc}; ${cur}` : `${cur}`, '') : '';
     const thumbnailUrl = book.imageLinks.thumbnail;
     const shelf = book.shelf;
     return(
@@ -44,5 +45,6 @@ class BookItem extends Component {
     )
   }
 }
+
 
 export default BookItem;

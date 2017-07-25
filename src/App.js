@@ -1,6 +1,9 @@
 import React, { Component } from 'react';
 import * as BooksAPI from './BooksAPI';
 import BookShelf from './BookShelf';
+import BookGrid from './BookGrid';
+import { Link, Route } from 'react-router-dom';
+import debounce from 'lodash.debounce';
 import './App.css';
 
 class App extends Component {
@@ -10,9 +13,44 @@ class App extends Component {
     this.state = {
       currentlyReading: [],
       wantToRead: [],
-      read: []
+      read: [],
+      query: '',
+      queryResults: []
     }
   }
+
+  debounceQueryBooks=debounce(()=>{
+        // this.queryBooks(kw);
+        console.log('debounce');
+    }, 500);
+
+  handleSearch(kw) {
+    this.setState({query: kw});
+    this.queryBooksBounced();
+  }
+  queryBooksBounced =
+    debounce(()=>{
+      // if query keyword is empty,
+      // reset queryResults
+      const kw = this.state.query;
+      if(!kw) {
+        this.setState({
+          query: '',
+          queryResults: [],
+        });
+        return;
+      }
+
+      BooksAPI.search(kw)
+        .then(results => {
+          this.setState({
+            query: kw,
+            queryResults: results || []
+          });
+        });
+
+    });
+
   componentDidMount() {
     BooksAPI.search('art', 10)
       .then(books=>console.log(books));
@@ -58,13 +96,15 @@ class App extends Component {
 
     const bookId = book.id;
     const oldShelfName = book.shelf;
-    const oldShelf = Array.prototype.slice.call(this.state[oldShelfName]);
 
     BooksAPI.update(book, newShelfName)
     .then(data=> {
       let newState = {};
-      // remove the book from the old shelf
-      newState[oldShelfName] = oldShelf.filter((b) => b.id!==bookId);
+      // if old shelf name is not none, remove the book from the old shelf
+      if(oldShelfName!=='none') {
+        const oldShelf = Array.prototype.slice.call(this.state[oldShelfName]);
+        newState[oldShelfName] = oldShelf.filter((b) => b.id!==bookId);
+      }
       // if new shelf name is not none, add the update book to the correct shelf
       if(newShelfName!== 'none') {
         const newShelf = Array.prototype.slice.call(this.state[newShelfName]);
@@ -81,26 +121,52 @@ class App extends Component {
   render() {
     return (
       <div className="app">
-        <div className="list-books">
-          <div className="list-books-title">
-            <h1>MyReads</h1>
+        <Route exact path="/" render={()=>(
+          <div className="list-books">
+            <div className="list-books-title">
+              <h1>MyReads</h1>
+            </div>
+            <div className="list-books-content">
+              <BookShelf shelfName={'Currently Reading'}
+                books={this.state.currentlyReading}
+                changeShelf={(book, newShelf)=>this.changeShelf(book, newShelf)}/>
+              <BookShelf shelfName={'Want to Read'}
+                books={this.state.wantToRead}
+                changeShelf={(book, newShelf)=>this.changeShelf(book, newShelf)}/>
+              <BookShelf shelfName={'Read'}
+                books={this.state.read}
+                changeShelf={(book, newShelf)=>this.changeShelf(book, newShelf)}/>
+            </div>
+            <div className="open-search">
+              <Link to="/search" />
+            </div>
           </div>
-          <div className="list-books-content">
-            <BookShelf shelfName={'Currently Reading'}
-              books={this.state.currentlyReading}
-              changeShelf={(book, newShelf)=>this.changeShelf(book, newShelf)}/>
-            <BookShelf shelfName={'Want to Read'}
-              books={this.state.wantToRead}
-              changeShelf={(book, newShelf)=>this.changeShelf(book, newShelf)}/>
-            <BookShelf shelfName={'Read'}
-              books={this.state.read}
-              changeShelf={(book, newShelf)=>this.changeShelf(book, newShelf)}/>
-          </div>
+        )} />
+        <Route path="/search" render={()=>(
+          <div className="search-books">
+            <div className="search-books-bar">
+              <Link className="close-search" to="/"/>
+              <div className="search-books-input-wrapper">
+                <input type="text"
+                  value={this.state.query}
+                  onChange={(e)=>this.handleSearch(e.target.value)}
+                placeholder="Search by title or author"/>
+              </div>
+            </div>
+            <BookGrid
+              className="search-books-results"
+              books={this.state.queryResults}
+              changeShelf={(book, newShelf)=>this.changeShelf(book, newShelf)}
+            />
 
-        </div>
+          </div>
+        )} />
+
       </div>
-    );
+          );
   }
 }
 
 export default App;
+/*
+*/
