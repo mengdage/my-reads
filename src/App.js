@@ -35,7 +35,6 @@ class App extends Component {
       const kw = this.state.query;
       if(!kw) {
         this.setState({
-          query: '',
           queryResults: [],
         });
         return;
@@ -43,9 +42,9 @@ class App extends Component {
 
       BooksAPI.search(kw)
         .then(results => {
+          const qr = Array.isArray(results)? results : [];
           this.setState({
-            query: kw,
-            queryResults: results || []
+            queryResults: qr
           });
         });
 
