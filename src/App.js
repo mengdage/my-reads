@@ -19,26 +19,14 @@ class App extends Component {
     }
   }
 
-  debounceQueryBooks=debounce(()=>{
-        // this.queryBooks(kw);
-        console.log('debounce');
-    }, 500);
-
   handleSearch(kw) {
     this.setState({query: kw});
-    this.queryBooksBounced();
+    this.queryBooksDebounced();
   }
-  queryBooksBounced =
+
+  queryBooksDebounced =
     debounce(()=>{
-      // if query keyword is empty,
-      // reset queryResults
       const kw = this.state.query;
-      if(!kw) {
-        this.setState({
-          queryResults: [],
-        });
-        return;
-      }
 
       BooksAPI.search(kw)
         .then(results => {
@@ -48,7 +36,7 @@ class App extends Component {
           });
         });
 
-    });
+    },500);
 
   componentDidMount() {
     BooksAPI.search('art', 10)
