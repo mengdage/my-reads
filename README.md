@@ -4,8 +4,6 @@ First project of React Nanodegree Program from Udacity.
 
 ## Qucikstart
 
-- Install [Node](https://nodejs.org/en/),[Gulp](http://gulpjs.com/).
-
 - Clone the repository, navigate to this project, and install dependencies.
 
 ```
