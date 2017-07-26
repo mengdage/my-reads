@@ -15,9 +15,10 @@ class BookGrid extends Component {
     const className = this.props.className;
     return(
       <div className={className}>
-        <ol className="books-grid">
+        {books.length>0 && <ol className="books-grid">
           {booksList}
-        </ol>
+        </ol>}
+        {books.length===0 && <div className="error-msg">No book available!</div>}
       </div>
 
     );

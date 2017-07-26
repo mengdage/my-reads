@@ -15,12 +15,13 @@ class App extends Component {
       wantToRead: [],
       read: [],
       query: '',
+      loading: false,
       queryResults: []
     }
   }
 
   handleSearch(kw) {
-    this.setState({query: kw});
+    this.setState({query: kw, loading: true});
     this.queryBooksDebounced();
   }
 
@@ -32,7 +33,8 @@ class App extends Component {
         .then(results => {
           const qr = Array.isArray(results)? results : [];
           this.setState({
-            queryResults: qr
+            queryResults: qr,
+            loading: false
           });
         });
 
@@ -140,6 +142,7 @@ class App extends Component {
                 placeholder="Search by title or author"/>
               </div>
             </div>
+            {this.state.loading && <div className="loading">Loading</div>}
             <BookGrid
               className="search-books-results"
               books={this.state.queryResults}
