@@ -105,7 +105,7 @@ body, .app {
 
 .loading {
   position: absolute;
-  height: 100vh;
+  height: 100%;
   width: 100vw;
   opacity: 0.6;
   background: #c6c6c6;

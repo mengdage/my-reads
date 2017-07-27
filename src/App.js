@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import * as BooksAPI from './BooksAPI';
 import BookShelf from './BookShelf';
 import BookGrid from './BookGrid';
+import SearchBar from './SearchBar';
 import { Link, Route } from 'react-router-dom';
 import debounce from 'lodash.debounce';
 import './App.css';
@@ -14,26 +15,45 @@ class App extends Component {
       currentlyReading: [],
       wantToRead: [],
       read: [],
-      query: '',
       loading: false,
+      query: '',
       queryResults: []
     }
   }
 
-  handleSearch(kw) {
-    this.setState({query: kw, loading: true});
-    this.queryBooksDebounced();
+  handleSearch(query) {
+    this.setState({
+      loading: true
+    });
+    this.queryBooksDebounced(query);
   }
 
   queryBooksDebounced =
-    debounce(()=>{
-      const kw = this.state.query;
+    debounce((query)=>{
+      // if query is empty, ignore the query, cancel the loading, set query result to empty array
+      if(!query){
+        this.setState({
+          queryResults: [],
+          query: query,
+          loading: false
+        });
+        return;
+      }
 
-      BooksAPI.search(kw)
+      // if the query is the same as the last query, do not send new request to the server
+      if(query === this.state.query) {
+        this.setState({
+          loading: false
+        });
+        return;
+      }
+
+      BooksAPI.search(query)
         .then(results => {
           const qr = Array.isArray(results)? results : [];
           this.setState({
             queryResults: qr,
+            query: query,
             loading: false
           });
         });
@@ -41,12 +61,8 @@ class App extends Component {
     },500);
 
   componentDidMount() {
-    BooksAPI.search('art', 10)
-      .then(books=>console.log(books));
-
     BooksAPI.getAll()
       .then(books => {
-        console.log(books);
         // create copies of shelves
         const current = Array.prototype.slice.call(this.state.currentlyReading);
         const want = Array.prototype.slice.call(this.state.wantToRead);
@@ -133,15 +149,9 @@ class App extends Component {
         )} />
         <Route path="/search" render={()=>(
           <div className="search-books">
-            <div className="search-books-bar">
-              <Link className="close-search" to="/"/>
-              <div className="search-books-input-wrapper">
-                <input type="text"
-                  value={this.state.query}
-                  onChange={(e)=>this.handleSearch(e.target.value)}
-                placeholder="Search by title or author"/>
-              </div>
-            </div>
+            <SearchBar
+              defaultValue={this.state.query}
+              handleSearch={(query)=>this.handleSearch(query)}/>
             {this.state.loading && <div className="loading">Loading</div>}
             <BookGrid
               className="search-books-results"

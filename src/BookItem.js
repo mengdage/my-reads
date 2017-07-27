@@ -3,7 +3,6 @@ import React, { Component } from 'react';
 class BookItem extends Component {
 
   handleChange(e) {
-    console.log(e.target.value);
     const book = this.props.book;
     const newShelf = e.target.value;
     this.props.changeShelf(book, newShelf);
