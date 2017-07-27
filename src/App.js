@@ -21,7 +21,7 @@ class App extends Component {
     }
   }
 
-  handleSearch(query) {
+  handleSearch = (query) => {
     this.setState({
       loading: true
     });
@@ -93,7 +93,7 @@ class App extends Component {
       });
   }
 
-  changeShelf(book, newShelfName) {
+  changeShelf = (book, newShelfName) => {
     // if shelf does not change, ignore
     if(book.shelf === newShelfName) {
       return;
@@ -151,12 +151,12 @@ class App extends Component {
           <div className="search-books">
             <SearchBar
               defaultValue={this.state.query}
-              handleSearch={(query)=>this.handleSearch(query)}/>
+              handleSearch={this.handleSearch}/>
             {this.state.loading && <div className="loading">Loading</div>}
             <BookGrid
               className="search-books-results"
               books={this.state.queryResults}
-              changeShelf={(book, newShelf)=>this.changeShelf(book, newShelf)}
+              changeShelf={this.changeShelf}
             />
 
           </div>

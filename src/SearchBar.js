@@ -3,9 +3,9 @@ import { Link } from 'react-router-dom';
 
 class SearchBar extends Component {
 
-  handleChange() {
+  handleChange = () => {
     this.props.handleSearch(this.input.value);
-  }
+  };
 
   render() {
     return(
@@ -15,7 +15,7 @@ class SearchBar extends Component {
           <input type="text"
             defaultValue={this.props.defaultValue}
             ref={(input => this.input=input)}
-            onChange={()=>this.handleChange()}
+            onChange={this.handleChange}
           placeholder="Search by title or author"/>
         </div>
       </div>
